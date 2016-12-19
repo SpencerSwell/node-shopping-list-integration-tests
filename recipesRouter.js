@@ -18,6 +18,7 @@ Recipes.create(
 // on GET requests to root
 router.get('/', (req, res) => {
   res.json(Recipes.get());
+  res.status(200);
 });
 
 

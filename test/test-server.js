@@ -142,3 +142,42 @@ describe('Shopping List', function() {
       });
   });
 });
+
+
+describe ('Recipe list', function() {
+
+it('Should give us the list of recipes on a get request', function() {
+  return chai.request(app)
+
+  .get('/recipes')
+  .then(function (res) {
+    //returning the result of the get request
+    return chai.request(app)
+    res.should.be.json;
+    res.should.have.status(200);
+
+  });
+
+});
+
+it('Should allow us to add recipes to the database', function() {
+  let newRecipe = {name:'Pizza', ingredients:'Cheese, toppings, sauce'};
+  return chai.request(app)
+  .post('/recipes')
+  .send(newRecipe)
+  .then(function (req,res) {
+    return chai.request(app)
+    req.should.be.json
+    req.body.length.should.equal(2); 
+
+    res.should.be.json
+    res.status.should.have.status(201);
+    res.body.should.include.keys('id', 'name', 'ingredients');
+    res.body.should.be.a('object');
+
+    })
+
+  })
+
+
+})
