@@ -44,11 +44,11 @@ describe('Shopping List', function() {
     // at the end of the test. The `chai.request(server).get...` call is asynchronous
     // and returns a Promise, so we just return it.
     return chai.request(app)
-      .get('/shopping-list')
-      .then(function(res) {
-        res.should.have.status(200);
-        res.should.be.json;
-        res.body.should.be.a('array');
+    .get('/shopping-list')
+    .then(function(res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('array');
 
         // because we create three items on app load
         res.body.length.should.be.at.least(1);
@@ -69,14 +69,14 @@ describe('Shopping List', function() {
   it('should add an item on POST', function() {
     const newItem = {name: 'coffee', checked: false};
     return chai.request(app)
-      .post('/shopping-list')
-      .send(newItem)
-      .then(function(res) {
-        res.should.have.status(201);
-        res.should.be.json;
-        res.body.should.be.a('object');
-        res.body.should.include.keys('id', 'name', 'checked');
-        res.body.id.should.not.be.null;
+    .post('/shopping-list')
+    .send(newItem)
+    .then(function(res) {
+      res.should.have.status(201);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.include.keys('id', 'name', 'checked');
+      res.body.id.should.not.be.null;
         // response should be deep equal to `newItem` from above if we assign
         // `id` to it from `res.body.id`
         res.body.should.deep.equal(Object.assign(newItem, {id: res.body.id}));
@@ -111,8 +111,8 @@ describe('Shopping List', function() {
         // returning a promise and chaining with `then`, but we find
         // this approach cleaner and easier to read and reason about.
         return chai.request(app)
-          .put(`/shopping-list/${updateData.id}`)
-          .send(updateData);
+        .put(`/shopping-list/${updateData.id}`)
+        .send(updateData);
       })
       // prove that the PUT request has right status code
       // and returns updated item
@@ -122,7 +122,7 @@ describe('Shopping List', function() {
         res.body.should.be.a('object');
         res.body.should.deep.equal(updateData);
       });
-  });
+    });
 
   // test strategy:
   //  1. GET a shopping list items so we can get ID of one
@@ -135,22 +135,22 @@ describe('Shopping List', function() {
       .get('/shopping-list')
       .then(function(res) {
         return chai.request(app)
-          .delete(`/shopping-list/${res.body[0].id}`);
+        .delete(`/shopping-list/${res.body[0].id}`);
       })
       .then(function(res) {
         res.should.have.status(204);
       });
-  });
+    });
 });
 
 
 describe ('Recipe list', function() {
 
-it('Should give us the list of recipes on a get request', function() {
-  return chai.request(app)
+  it('Should give us the list of recipes on a get request', function() {
+    return chai.request(app)
 
-  .get('/recipes')
-  .then(function (res) {
+    .get('/recipes')
+    .then(function (res) {
     //returning the result of the get request
     return chai.request(app)
     res.should.be.json;
@@ -158,26 +158,66 @@ it('Should give us the list of recipes on a get request', function() {
 
   });
 
-});
+  });
 
-it('Should allow us to add recipes to the database', function() {
-  let newRecipe = {name:'Pizza', ingredients:'Cheese, toppings, sauce'};
-  return chai.request(app)
-  .post('/recipes')
-  .send(newRecipe)
-  .then(function (req,res) {
+  it('Should allow us to add recipes to the database', function() {
+    let newRecipe = {name:'Pizza', ingredients:'Cheese, toppings, sauce'};
     return chai.request(app)
-    req.should.be.json
-    req.body.length.should.equal(2); 
+    .post('/recipes')
+    .send(newRecipe)
+    .then(function (req,res) {
+      return chai.request(app)
+      req.should.be.json
+      req.body.length.should.equal(2); 
 
-    res.should.be.json
-    res.status.should.have.status(201);
-    res.body.should.include.keys('id', 'name', 'ingredients');
-    res.body.should.be.a('object');
+      res.should.be.json
+      res.status.should.have.status(201);
+      res.body.should.include.keys('id', 'name', 'ingredients');
+      res.body.should.be.a('object');
 
     })
 
   })
 
+  it('Should allow us to Delete items from the database', function() {
+   return chai.request(app)
+   .get('/recipes')
+   .then( function(res) {
+    return chai.request(app)
+    .delete(`/recipes/${res.body[0].id}`)
+    .then( function (res) {
+      return chai.request(app)
+      res.body.status.should.be(202);
+
+    })
+
+  })
+
+ })
+
+  it('Should allow us to update an existing item', function(){
+       var theResult = chai.request(app);
+       //we are returning the value of the promise which is chai.request(app) and it's the same as returning the value of a variable
+    return theResult
+    .get('/recipes')
+    .then(function(res){
+      return theResult
+      const data = {
+        name:'foo',
+        ingredients: 'bar',
+        id:res.body[1].id
+       };
+       return theResult
+      .put(`/recipes/${res.body[1].id}`)
+      .send(data)
+      .then(function(res){
+        return theResult
+          res.should.be.json
+          res.should.have.status(201)
+        })
+    })
+
+
+  })
 
 })
